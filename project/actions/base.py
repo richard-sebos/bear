@@ -3,13 +3,15 @@
 # Date: 
 # Description: Base class for all actions in the Bear application.
 
-class Action:
-    """Base class for all actions."""
-    def execute(self, target):
-        """Execute the action on a given target. Must be implemented by subclasses."""
-        raise NotImplementedError("Subclasses must implement this method.")
+class Action():
+    def command(self):
+        return "hidden"
 
-    def log(self, message):
-        """Log a message related to the action."""
-        print(f"LOG: {message}")
+    def description(self):
+        return "This action is hidden and not available in the menu."
 
+    def include_in_menu(self):
+        return False  # Exclude from the menu
+
+    def execute(self, args, id_mapping):
+        print("This action is executed but not listed in the menu.")
