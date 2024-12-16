@@ -1,10 +1,10 @@
 # App: Bear
 # Company: Sebos Technology
-# Date: 
-# Description: Main entry point for the Bear application. This script orchestrates the application flow, including user input parsing, target validation, and action execution.
+# Description: Main entry point for the Bear application.
 
 import argparse
 from action_loader import load_actions
+from actions.list_action import ListAction
 from utils.validation_utils import validate_targets
 import ipaddress
 
@@ -17,41 +17,64 @@ def expand_cidr(cidr):
         print(f"Error: Invalid CIDR format '{cidr}'.")
         return []
 
+def interactive_session(active_ips, actions):
+    """
+    Start an interactive session to perform additional actions.
+    """
+    id_mapping = {idx + 1: ip for idx, ip in enumerate(active_ips)}
+    print("\nEntering interactive session. Type 'help' to see available commands.")
+
+    while True:
+        command = input(">> ").strip().lower().split()
+        if not command:
+            continue
+        
+        action_name, *args = command
+
+        if action_name == "help":
+            print("\nAvailable commands (sorted alphabetically):")
+            for action in sorted(actions, key=lambda x: x.command()):
+                if action.include_in_menu():
+                    print(f"  {action.command():<10} - {action.description()}")
+            print("  help         - Show this help menu")
+            print("  exit         - Exit the interactive session")
+        
+        elif action_name == "exit":
+            print("\nExiting interactive session.")
+            break
+        
+        else:
+            matched_action = next((action for action in actions if action.command() == action_name), None)
+            if matched_action:
+                try:
+                    matched_action.execute(args, id_mapping)
+                except Exception as e:
+                    print(f"Error running action '{action_name}': {e}")
+            else:
+                print(f"Unknown command: {action_name}. Type 'help' for a list of available commands.")
+
 def main():
     """Main function orchestrates the flow of the application."""
     parser = argparse.ArgumentParser(description="Network Scanning Tool")
     parser.add_argument('--ip', type=str, help='Single IP address to scan')
     parser.add_argument('--cidr', type=str, help='CIDR subnet to scan')
     parser.add_argument('--list', type=str, help='File containing a list of IPs to scan')
-    parser.add_argument('--note-mode', action='store_true', help='Enable notes mode')
-    parser.add_argument('--debug', action='store_true', help='Enable debug mode')
     args = parser.parse_args()
 
-    # Validate at least one target input
-    if not (args.ip or args.cidr or args.list):
-        print("Error: At least one of --ip, --cidr, or --list must be provided to specify targets.")
-        print("Usage Examples:")
-        print("  --ip 192.168.1.1")
-        print("  --cidr 192.168.1.0/24")
-        print("  --list targets.txt")
-        return
-
-    # Collect targets from user input
+    # Collect and validate targets
     targets = []
     if args.ip:
         targets.append(args.ip)
     if args.cidr:
-        targets.extend(expand_cidr(args.cidr))  # Expand CIDR to individual IPs
+        targets.extend(expand_cidr(args.cidr))
     if args.list:
         try:
             with open(args.list, 'r') as file:
                 targets.extend(file.read().splitlines())
         except FileNotFoundError:
             print(f"Error: File '{args.list}' not found.")
-            print("Ensure the file exists and try again.")
             return
 
-    # Validate targets
     valid_targets = validate_targets(targets)
     if not valid_targets:
         print("No valid targets provided. Exiting.")
@@ -59,17 +82,37 @@ def main():
 
     # Load actions
     actions = load_actions()
-    if args.debug:
-        print("Loaded actions:", [action.__class__.__name__ for action in actions])
+    starting_action = next((action for action in actions if action.__class__.__name__ == "StartingAction"), None)
 
-    # Execute actions on targets
+    if starting_action is None:
+        print("Error: StartingAction is not defined. Ensure it's implemented and loaded.")
+        return
+
+    # Run StartingAction to validate targets
+    print("Validating targets with StartingAction...")
+    active_ips = []
     for target in valid_targets:
-        print(f"Processing target: {target}")
-        for action in actions:
-            try:
-                action.execute(target)
-            except Exception as e:
-                print(f"Error executing action {action.__class__.__name__} on {target}: {e}")
+        try:
+            status = starting_action.execute(target)
+            if status == "UP":
+                print(f"{target} is UP.")
+                active_ips.append(target)
+            else:
+                print(f"{target} is {status}. Skipping.")
+        except Exception as e:
+            print(f"Error executing StartingAction on {target}: {e}")
+
+    if not active_ips:
+        print("No active IPs found. Exiting.")
+        return
+
+    # Add actions, including the ListAction and HiddenAction
+    list_action = ListAction(active_ips)
+    actions.append(list_action)
+
+
+    # Start interactive session
+    interactive_session(active_ips, actions)
 
 if __name__ == "__main__":
     main()
