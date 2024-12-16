@@ -99,6 +99,7 @@ def main():
                 active_ips.append(target)
             else:
                 print(f"{target} is {status}. Skipping.")
+                active_ips.append(target)
         except Exception as e:
             print(f"Error executing StartingAction on {target}: {e}")
 
