@@ -1,25 +1,39 @@
-# App: Bear
-# Company: Sebos Technology
-# Date: 
-# Description: Module for dynamically loading action classes from the actions directory.
-
-import os
 import importlib
+import os
+import inspect
+from actions.base import Action
 
-def load_actions():
-    """Dynamically load action classes from the actions/ directory."""
+def load_actions(actions_dir="actions"):
+    """
+    Dynamically load all action classes from the specified directory.
+
+    Args:
+        actions_dir (str): Path to the directory containing action files.
+
+    Returns:
+        list: A list of instantiated action classes.
+    """
     actions = []
-    action_dir = os.path.join(os.path.dirname(__file__), 'actions')
 
-    for file in os.listdir(action_dir):
-        if file=='list_action.py':
-            continue
-        if file.endswith('.py') and file != '__init__.py':
-            module_name = f'actions.{file[:-3]}'
-            module = importlib.import_module(module_name)
-            for attr in dir(module):
-                cls = getattr(module, attr)
-                if isinstance(cls, type) and hasattr(cls, 'execute'):
-                    actions.append(cls())
+    # Ensure the actions directory exists
+    if not os.path.isdir(actions_dir):
+        print(f"Error: The actions directory '{actions_dir}' does not exist.")
+        return actions
+
+    # Iterate over all Python files in the actions directory
+    for filename in os.listdir(actions_dir):
+        if filename.endswith(".py") and filename != "base.py":
+            module_name = f"{actions_dir}.{filename[:-3]}"
+            try:
+                # Dynamically import the module
+                module = importlib.import_module(module_name)
+
+                # Find classes in the module that inherit from Action
+                for name, obj in inspect.getmembers(module, inspect.isclass):
+                    if issubclass(obj, Action) and obj is not Action:
+                        actions.append(obj())  # Instantiate the class
+
+            except Exception as e:
+                print(f"Error loading action from {filename}: {e}")
+
     return actions
-
