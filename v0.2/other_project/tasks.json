@@ -1,0 +1,4 @@
+[
+    { "task_id": "001", "description": "Backup the database", "class_name": "BackupTask", "parameters": { "path": "/backup/db", "compress": true } },
+    { "task_id": "002", "description": "Clean temporary files", "class_name": "CleanupTask", "parameters": { "location": "/tmp", "age": "30d" } }
+]

@@ -1,0 +1,70 @@
+@startuml
+
+interface IReportGenerator {
+  + generateReport(task: Task): Report
+}
+
+interface IActionExecutor {
+  + executeAction(task: Task): void
+}
+
+abstract class Report {
+  + content: String
+  + format(): String
+}
+
+class MarkdownReport extends Report {
+  + format(): String
+}
+
+class Task {
+  + id: String
+  + description: String
+  + schedule(): void
+}
+
+class TaskScheduler {
+  + scheduleTask(task: Task): void
+  + delegateExecution(task: Task): void
+}
+
+class ExecutionManager {
+  + execute(task: Task): void
+  + generateReport(task: Task): Report
+}
+
+class ActionExecutor implements IActionExecutor {
+  + executeAction(task: Task): void
+}
+
+class ReportGenerator implements IReportGenerator {
+  + generateReport(task: Task): Report
+}
+
+class AlertManager {
+  + sendAlert(task: Task, reason: String): void
+}
+
+class Logger {
+  + log(message: String): void
+}
+
+class EncryptionManager {
+  + encrypt(data: String): String
+  + decrypt(data: String): String
+}
+
+class FileEditor {
+  + readFile(path: String): String
+  + writeFile(path: String, data: String): void
+}
+
+TaskScheduler --> ExecutionManager : delegates to
+ExecutionManager --> ActionExecutor : uses
+ExecutionManager --> ReportGenerator : generates
+ReportGenerator --> Report : creates
+AlertManager --> TaskScheduler : monitors
+AlertManager --> Logger : logs alerts
+FileEditor --> EncryptionManager : encrypts/decrypts
+
+@enduml

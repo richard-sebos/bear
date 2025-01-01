@@ -1,0 +1,31 @@
+project_root/
+├── src/
+│   ├── __init__.py
+│   ├── tasks/
+│   │   ├── __init__.py
+│   │   ├── task.py                  # Task class
+│   │   ├── scheduler.py             # TaskScheduler class
+│   │   ├── execution_manager.py     # ExecutionManager class
+│   │   ├── action_executor.py       # ActionExecutor class
+│   ├── reporting/
+│   │   ├── __init__.py
+│   │   ├── report.py                # Abstract Report class and MarkdownReport
+│   │   ├── report_generator.py      # ReportGenerator class
+│   ├── alerts/
+│   │   ├── __init__.py
+│   │   ├── alert_manager.py         # AlertManager class
+│   │   ├── logger.py                # Logger class
+│   ├── files/
+│   │   ├── __init__.py
+│   │   ├── file_editor.py           # FileEditor class
+│   │   ├── encryption_manager.py    # EncryptionManager class
+│   ├── __main__.py                  # Main entry point
+├── tests/
+│   ├── __init__.py
+│   ├── test_tasks.py                # Unit tests for Task-related classes
+│   ├── test_reporting.py            # Unit tests for reporting components
+│   ├── test_alerts.py               # Unit tests for alerts and logging
+│   ├── test_files.py                # Unit tests for FileEditor and EncryptionManager
+├── requirements.txt                 # Dependencies
+├── README.md                        # Project description and usage
+├── .gitignore                       # Git ignore file

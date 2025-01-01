@@ -1,0 +1,19 @@
+@startuml
+
+actor User as user
+participant "ActionExecutor" as executor
+participant "ReportGenerator" as reportGen
+participant "HistoryAnalyzer" as analyzer
+participant "AlertManager" as alertMgr
+
+user -> executor : executeAction(ip, action)
+executor -> executor : fetchParameters(ip)
+executor --> executor : execute(action)
+executor -> reportGen : generateReport(ip, actionResults)
+reportGen -> reportGen : updateMarkdown(ip, reportData)
+reportGen -> analyzer : analyzeHistory(ip)
+analyzer -> analyzer : compareResults(current, previous)
+analyzer --> alertMgr : sendAlert(ip, issue) [if issue detected]
+alertMgr -> user : notify(issue)
+
+@enduml

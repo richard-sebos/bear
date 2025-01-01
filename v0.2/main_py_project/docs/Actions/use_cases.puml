@@ -1,0 +1,42 @@
+@startuml
+
+actor "User" as user
+actor "CI/CD Pipeline" as cicd
+actor "Alerting System" as alerting
+
+rectangle "Server Maintenance Report and Action Execution System" {
+    usecase "Execute Actions on Target Servers" as UC1
+    usecase "Generate Markdown Report" as UC2
+    usecase "Analyze Historical Data" as UC3
+    usecase "Customize Reports" as UC4
+    usecase "Configure Alerting Rules" as UC5
+    usecase "Automate Execution" as UC6
+    usecase "Encrypt/Decrypt Files" as UC7
+    usecase "Edit Encrypt/Decrypt Files" as UC9
+    usecase "Integrate with External Systems" as UC8
+    usecase "Configure Encryption Settings" as UC10
+    usecase "View Documentation and Templates" as UC11
+}
+
+user --> UC1 : Executes Actions
+user --> UC2 : Views Reports
+user --> UC4 : Defines Custom Reports
+user --> UC5 : Sets Up Alerts
+user --> UC6 : Schedules Tasks
+user --> UC9 : Edits Encrypt/Decrypt Files
+user --> UC10 : Configures Encryption Settings
+user --> UC11 : Views Guidance
+
+UC1 --> UC2 : Updates Report
+UC2 --> UC3 : Parses Historical Data
+UC3 --> UC4 : Allows Customization
+UC5 --> alerting : Sends Alerts
+UC6 --> UC7 : Automates Encryption/Decryption
+UC6 --> UC2 : Automates Report Generation
+UC7 --> UC9 : Enables Editing of Files
+UC9 --> UC10 : Depends on Encryption Settings
+
+cicd --> UC1 : Automates Execution
+cicd --> UC6 : Schedules Execution
+
+@enduml

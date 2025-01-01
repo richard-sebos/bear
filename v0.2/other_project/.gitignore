@@ -1,0 +1,47 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Virtual environments
+venv/
+ENV/
+*.env
+
+# Testing
+*.pytest_cache/
+.tox/
+.nox/
+
+# Logs
+*.log
+
+# IDE Specific
+.vscode/
+.idea/
+*.swp
+*.swo
+*.swn
+
+# Byte-compiled files
+*.pyc
+
+# Coverage reports
+htmlcov/
+*.cover
+.coverage
+.coverage.*
+.cache
+
+# Distribution/build artifacts
+dist/
+build/
+*.egg-info/
+.eggs/
+
+# Jupyter Notebook
+.ipynb_checkpoints/
+
+# System files
+.DS_Store
+Thumbs.db
